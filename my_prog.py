@@ -130,14 +130,14 @@ def process_multiple_circles(image_data, centers, radius_mm):
         # Draw the circle on the image
         cv2.circle(image_data, center, radius_pixels, (0, 0, 255), 2, lineType=cv2.LINE_AA)
         # add index of center near circle
-        cv2.putText(image_data, str(idx), (center[0], center[1]), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-        idx+=1
+        # cv2.putText(image_data, str(idx), (center[0], center[1]), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+        # idx+=1
 
         # Write the sum of intensity on the image
         # text = f'Sum of intensity: {sum_intensity}'
         # cv2.putText(image_data, text, (center[0] - radius_pixels, center[1] - radius_pixels), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
 
-    cv2.imwrite(os.path.join(IMAGE_DIR, 'image_with_circles.png'), image_data)
+    # cv2.imwrite(os.path.join(IMAGE_DIR, 'image_with_circles.png'), image_data)
     return sum_intensities
 
 def generate_hexagon_vertices(center, radius):
@@ -175,7 +175,9 @@ def process_pv_buffer(pvbuffer, image_count):
     image_size = image_data.shape
 
     # Apply 'jet' colormap
-    image_data = cv2.applyColorMap(image_data, cv2.COLORMAP_JET)
+    # image_data = cv2.applyColorMap(image_data, cv2.COLORMAP_JET)
+    # Apply 'hot' colormap
+    image_data = cv2.applyColorMap(image_data, cv2.COLORMAP_HOT)
 
     # Calculate the sum of intensity within a circle
     radius_mm = 0.3  # Set the radius in mm
@@ -197,6 +199,29 @@ def process_pv_buffer(pvbuffer, image_count):
     # Save the image
     cv2.imwrite(os.path.join(IMAGE_DIR, f'image_{image_count}.png'), image_data)    
     return sum_intensity
+
+# function to read the images from the IMG_DIR and convert to video
+def images_to_video():
+    # get the list of images
+    images = [img for img in os.listdir(IMAGE_DIR) if img.endswith(".png")]
+    # sort the images
+    images.sort()
+    # get the first image
+    frame = cv2.imread(os.path.join(IMAGE_DIR, images[0]))
+    # get the height, width and number of channels of the image
+    height, width, channels = frame.shape
+    # define the video codec
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    # create the video writer object
+    video = cv2.VideoWriter('video.mp4', fourcc, 10, (width, height))
+    # loop through the images
+    for image in images:
+        # read the image
+        frame = cv2.imread(os.path.join(IMAGE_DIR, image))
+        # write the image to video
+        video.write(frame)
+    # release the video writer object
+    video.release()
 
 def acquire_images(device, stream):
     # Get device parameters need to control streaming
@@ -230,6 +255,7 @@ def acquire_images(device, stream):
                 sl_array.append(sl)
                 image_count += 1
 
+    images_to_video() # convert images to video
     sl_array = np.array(sl_array)
 
     # Assuming sl_array is your array of data
@@ -260,7 +286,6 @@ def acquire_images(device, stream):
     stream.AbortQueuedBuffers()
     while stream.GetQueuedBufferCount() > 0:
         result, pvbuffer, lOperationalResult = stream.RetrieveBuffer()
-# Other code remains the same...
 
 print("PvStreamSample:")
 
