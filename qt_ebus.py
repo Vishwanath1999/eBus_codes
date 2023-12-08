@@ -132,7 +132,7 @@ class ImageAcquisitionThread(QThread):
                             if display_image:
                                 # cv2.imshow("stream",image_data)
                                 self.update_signal.emit(image_data)
-                                self.msleep(1/frame_rate_val)
+                                self.msleep(1000/frame_rate_val)
                             else:
                                 if not warning_issued:
                                     # display a message that video only display for Mono8 / RGB8 images
