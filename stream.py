@@ -191,30 +191,31 @@ def acquire_images(device, stream):
     while stream.GetQueuedBufferCount() > 0:
         result, pvbuffer, lOperationalResult = stream.RetrieveBuffer()
 
-print("PvStreamSample:")
+if __name__ == "__main__":
+    print("PvStreamSample:")
 
-connection_ID = psu.PvSelectDevice()
-if connection_ID:
-    device = connect_to_device(connection_ID)
-    if device:
-        stream = open_stream(connection_ID)
-        if stream:
-            configure_stream(device, stream)
-            buffer_list = configure_stream_buffers(device, stream)
-            acquire_images(device, stream)
-            buffer_list.clear()
-            
-            # Close the stream
-            print("Closing stream")
-            stream.Close()
-            eb.PvStream.Free(stream);    
+    connection_ID = psu.PvSelectDevice()
+    if connection_ID:
+        device = connect_to_device(connection_ID)
+        if device:
+            stream = open_stream(connection_ID)
+            if stream:
+                configure_stream(device, stream)
+                buffer_list = configure_stream_buffers(device, stream)
+                acquire_images(device, stream)
+                buffer_list.clear()
+                
+                # Close the stream
+                print("Closing stream")
+                stream.Close()
+                eb.PvStream.Free(stream);    
 
-        # Disconnect the device
-        print("Disconnecting device")
-        device.Disconnect()
-        eb.PvDevice.Free(device)
+            # Disconnect the device
+            print("Disconnecting device")
+            device.Disconnect()
+            eb.PvDevice.Free(device)
 
-print("<press a key to exit>")
-kb.start()
-kb.getch()
-kb.stop()
+    print("<press a key to exit>")
+    kb.start()
+    kb.getch()
+    kb.stop()

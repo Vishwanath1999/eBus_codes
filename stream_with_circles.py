@@ -13,8 +13,10 @@ import numpy as np
 import eBUS as eb
 import lib.PvSampleUtils as psu
 import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
 BUFFER_COUNT = 50
-plt.ion()
+global Height, Width
+# plt.ion()
 kb = psu.PvKb()
 
 opencv_is_available=True
@@ -163,13 +165,9 @@ def acquire_images(device, stream):
     display_image = False
     warning_issued = False
     
-    fig,ax = plt.subplots()
+    fig, ax = plt.subplots()
+    im = ax.imshow(np.zeros((Height, Width)), cmap='jet')
 
-    # Create an empty image with the same size as the images you will be acquiring
-    # initial_image_data = np.zeros((512, 640))  # adjust size as needed
-    # im = ax.imshow(initial_image_data, cmap='jet')
-    # fig.canvas.draw()
-    # background = fig.canvas.copy_from_bbox(ax.bbox)
     # Create a VideoWriter object
     # fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Use 'mp4v' for .mp4 output
     # out = cv2.VideoWriter('output.mp4', fourcc, 20.0, (128, 128))  # adjust frame rate and size as needed
@@ -224,12 +222,7 @@ def acquire_images(device, stream):
                             center=(image_size[1]//2, image_size[0]//2-20)
                             # image_data1=cv2.circle(image_data1, center, radius_pixels, (0, 0, 255), 2, lineType=cv2.LINE_AA)
                             # out.write(image_data)
-                            # im.set_data(image_data1)
-                            # Restore the background and redraw only the image
-                            # fig.canvas.restore_region(background)
-                            # ax.draw_artist(im)
-                            # fig.canvas.blit(ax.bbox)
-                            # plt.draw()
+
                             cv2.imshow("stream",image_data1)
                             # print(f'Sum of intensity within a circle of radius {radius_mm} mm: {sum_intensity}')
 
@@ -302,6 +295,8 @@ if connection_ID:
     height=512
     x_offset=0
     y_offset=0
+    
+    Height,Width = height,width 
     # print row and column start and stop
     print('Row start:',y_offset,'Row stop:',y_offset+height, 'Column start:',x_offset,'Column stop:',x_offset+width)
     parameters = device.GetParameters()
